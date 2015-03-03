@@ -1,5 +1,7 @@
 <?php namespace Ruysu\Authentify\Repositories;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 trait UserRepositoryTrait {
 
 	public function signUp(array $attributes) {
@@ -49,6 +51,43 @@ trait UserRepositoryTrait {
 
 	protected function performChangePassword($entity, array $attributes) {
 		return $this->perform('update', $entity, $attributes, false);
+	}
+
+	protected function performUpdate($user, array $attributes) {
+		if (isset($attributes['password']) && empty($attributes['password'])) {
+			unset($attributes['password']);
+		}
+
+		$this->uploadFiles($attributes);
+
+		return parent::performUpdate($user, $attributes);
+	}
+
+	protected function performCreate($user, array $attributes) {
+		$this->uploadFiles($attributes);
+
+		return parent::performCreate($user, $attributes);
+	}
+
+	protected function uploadFiles(&$attributes) {
+		$files = array_filter($attributes, function($file) {
+			return $file instanceof UploadedFile;
+		});
+
+		foreach ($files as $key => $file) {
+			$method = camel_case("upload_{$key}_file");
+
+			if (method_exists($this, $method)) {
+				$attributes[$key] = $this->$method($file);
+			}
+			else {
+				$path = public_path('uploads/users');
+				!is_dir($path) && mkdir($path, 0755, true);
+				$file->move($path);
+				$attributes[$key] = asset('uploads/users/' . $file->getClientOriginalName());
+			}
+		}
+		unset($key, $file);
 	}
 
 }

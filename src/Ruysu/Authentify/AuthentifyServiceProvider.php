@@ -66,61 +66,74 @@ class AuthentifyServiceProvider extends ServiceProvider {
 	protected function registerRoutes() {
 		if (!$this->config('routes.auto')) return;
 
-		$this->registerSignInRoutes();
-		$this->registerSignOutRoutes();
-		$this->registerSignUpRoutes();
-		$this->registerRemindRoutes();
-		$this->registerEditRoutes();
-		$this->registerPasswordRoutes();
-	}
-
-	protected function registerSignInRoutes() {
 		$prefix = $this->routePrefix();
-		$this->app['router']->get("{$prefix}sign-in", ['uses' => 'Authentify\SignInController@getIndex', 'as' => $this->routePrefix('.') . 'sign-in']);
-		$this->app['router']->post("{$prefix}sign-in", ['uses' => 'Authentify\SignInController@postIndex']);
+		$router = $this->app['router'];
+		$name_prefix = $this->routePrefix('.');
+
+		$router->group(['namespace' => 'Authentify', 'prefix' => $prefix], function () use ($router, $name_prefix) {
+			$router->group(['before' => 'authentify.guest'], function() use ($router, $name_prefix) {
+				$this->registerSignInRoutes($name_prefix, $router);
+				$this->registerSignUpRoutes($name_prefix, $router);
+				$this->registerRemindRoutes($name_prefix, $router);
+				$this->registerSocialRoutes($name_prefix, $router);
+			});
+
+			$router->group(['before' => 'authentify.check'], function() use ($router, $name_prefix) {
+				$this->registerSignOutRoutes($name_prefix, $router);
+				$this->registerEditRoutes($name_prefix, $router);
+				$this->registerPasswordRoutes($name_prefix, $router);
+			});
+		});
 	}
 
-	protected function registerSignOutRoutes() {
-		$prefix = $this->routePrefix();
-		$this->app['router']->delete("{$prefix}sign-out", ['uses' => 'Authentify\SignOutController@anyIndex', 'as' => $this->routePrefix('.') . 'sign-out']);
-		$this->app['router']->get("{$prefix}sign-out", ['uses' => 'Authentify\SignOutController@anyIndex']);
+	protected function registerSignInRoutes($prefix, $router) {
+		$router->get("sign-in", ['uses' => 'SignInController@getIndex', 'as' => $prefix . 'sign-in']);
+		$router->post("sign-in", ['uses' => 'SignInController@postIndex']);
 	}
 
-	protected function registerSignUpRoutes() {
+	protected function registerSignOutRoutes($prefix, $router) {
+		$router->delete("sign-out", ['uses' => 'SignOutController@anyIndex', 'as' => $prefix . 'sign-out']);
+		$router->get("sign-out", ['uses' => 'SignOutController@anyIndex']);
+	}
+
+	protected function registerSignUpRoutes($prefix, $router) {
 		if (!$this->config('registerable')) return;
-		$prefix = $this->routePrefix();
-		$this->app['router']->get("{$prefix}sign-up", ['uses' => 'Authentify\SignUpController@getIndex', 'as' => $this->routePrefix('.') . 'sign-up']);
-		$this->app['router']->post("{$prefix}sign-up", ['uses' => 'Authentify\SignUpController@postIndex']);
+		$router->get("sign-up", ['uses' => 'SignUpController@getIndex', 'as' => $prefix . 'sign-up']);
+		$router->post("sign-up", ['uses' => 'SignUpController@postIndex']);
+		$router->get("activate/{token}", ['uses' => 'SignUpController@getActivate', 'as' => $prefix . 'activate']);
 	}
 
-	protected function registerRemindRoutes() {
+	protected function registerRemindRoutes($prefix, $router) {
 		if (!$this->config('remindable')) return;
-		$prefix = $this->routePrefix();
-		$this->app['router']->get("{$prefix}remind", ['uses' => 'Authentify\RemindController@getIndex', 'as' => $this->routePrefix('.') . 'remind']);
-		$this->app['router']->post("{$prefix}remind", ['uses' => 'Authentify\RemindController@postIndex']);
-		$this->app['router']->get("{$prefix}reset/{token}", ['uses' => 'Authentify\RemindController@getReset', 'as' => $this->routePrefix('.') . 'reset']);
-		$this->app['router']->post("{$prefix}reset", ['uses' => 'Authentify\RemindController@postReset']);
+		$router->get("remind", ['uses' => 'RemindController@getIndex', 'as' => $prefix . 'remind']);
+		$router->post("remind", ['uses' => 'RemindController@postIndex']);
+		$router->get("reset/{token}", ['uses' => 'RemindController@getReset', 'as' => $prefix . 'reset']);
+		$router->post("reset", ['uses' => 'RemindController@postReset']);
 	}
 
-	protected function registerEditRoutes() {
+	protected function registerEditRoutes($prefix, $router) {
 		if (!$this->config('editable.info')) return;
-		$prefix = $this->routePrefix();
-		$this->app['router']->get("{$prefix}edit", ['uses' => 'Authentify\EditController@getIndex', 'as' => $this->routePrefix('.') . 'edit']);
-		$this->app['router']->post("{$prefix}edit", ['uses' => 'Authentify\EditController@postIndex']);
+		$router->get("edit", ['uses' => 'EditController@getIndex', 'as' => $prefix . 'edit']);
+		$router->post("edit", ['uses' => 'EditController@postIndex']);
 	}
 
-	protected function registerPasswordRoutes() {
+	protected function registerPasswordRoutes($prefix, $router) {
 		if (!$this->config('editable.password')) return;
-		$prefix = $this->routePrefix();
-		$this->app['router']->get("{$prefix}password", ['uses' => 'Authentify\PasswordController@getIndex', 'as' => $this->routePrefix('.') . 'password']);
-		$this->app['router']->post("{$prefix}password", ['uses' => 'Authentify\PasswordController@postIndex']);
+		$router->get("password", ['uses' => 'PasswordController@getIndex', 'as' => $prefix . 'password']);
+		$router->post("password", ['uses' => 'PasswordController@postIndex']);
+	}
+
+	protected function registerSocialRoutes($prefix, $router) {
+		if (!$this->config('social.enabled')) return;
+		$router->get("social/login/{network}", ['uses' => 'SocialController@getIndex', 'as' => $prefix . 'social']);
+		$router->get("social/do", ['uses' => 'SocialController@getDo', 'as' => $prefix . 'social.login']);
 	}
 
 	protected function config($key, $default = null) {
 		return $this->app['config']->get("authentify::{$key}", $default);
 	}
 
-	protected function routePrefix($delimiter = '/') {
+	protected function routePrefix($delimiter = '') {
 		return $this->config('routes.prefix') ? $this->config('routes.prefix') . $delimiter : '';
 	}
 

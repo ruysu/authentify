@@ -15,14 +15,6 @@ abstract class AuthentifyController extends Controller {
 	public function __construct(UserRepositoryInterface $users, AuthManager $auth) {
 		$this->users = $users;
 		$this->auth = $auth;
-		$class = get_class($this);
-
-		if (in_array($class, ['EditController', 'PasswordController', 'SignOutController'])) {
-			$this->beforeFilter('authentify.check');
-		}
-		else {
-			$this->beforeFilter('authentify.guest');
-		}
 	}
 
 	protected function valid($action, array $attributes, $merge = true) {

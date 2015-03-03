@@ -8,7 +8,7 @@
 
 @section('content')
 
-		{{ Form::model(Auth::user(), array('action' => $edit_action)) }} 
+		{{ Form::model(Auth::user(), array('action' => $edit_action, 'files' => 1)) }} 
 			<fieldset>
 				<legend>{{ trans('authentify::labels.my-account') }}</legend>
 
@@ -22,6 +22,12 @@
 					{{ Form::label('authentify-name', trans('authentify::labels.name')) }} 
 					{{ Form::text('name', null, array('class' => 'form-control', 'id' => 'authentify-name')) }} 
 					{{ $errors->has('name') ? Form::label('authentify-name', $errors->first('name'), array('class' => 'error')) : '' }} 
+				</div>
+
+				<div class="form-group">
+					{{ Form::label('authentify-picture', trans('authentify::labels.picture')) }} 
+					{{ Form::file('picture', array('id' => 'authentify-picture')) }} 
+					{{ $errors->has('picture') ? Form::label('authentify-picture', $errors->first('picture'), array('class' => 'error')) : '' }} 
 				</div>
 
 				{{ Form::submit(trans('authentify::labels.update'), array('class' => 'btn btn-block btn-lg btn-primary')) }} 

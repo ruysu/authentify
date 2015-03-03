@@ -4,6 +4,7 @@ return array(
 	'username' => 'Username',
 	'email' => 'E-mail',
 	'name' => 'Name',
+	'picture' => 'Profile Picture',
 	'roles' => 'Role',
 	'password' => 'Password',
 	'password_confirmation' => 'Confirm your password',
