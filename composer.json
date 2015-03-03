@@ -1,0 +1,26 @@
+{
+    "name": "ruysu/authentify",
+    "description": "User",
+    "authors": [
+        {
+            "name": "Gerardo Gómez",
+            "email": "code@gerardo.im"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "hybridauth/hybridauth": "2.3.*",
+        "anlutro/l4-repository": "0.7.8",
+        "anlutro/l4-controller": "0.3.4"
+    },
+    "autoload": {
+        "classmap": [
+            "resources/controllers"
+        ],
+        "psr-0": {
+            "Ruysu\\Authentify\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
