@@ -7,15 +7,15 @@ return array(
 			'Twitter' => array(
 				'enabled' => true,
 				'keys' => array(
-					'key' => 'eyka8ekAOD9XNxvgjK6PdQ', 
-					'secret' => 'STRYTIuS9Sdfw2wjoXb9PZdtaZMU8afTYy3wTIM'
+					'key' => '', 
+					'secret' => ''
 				)
 			),
 			'Facebook' => array(
 				'enabled' => true,
 				'keys' => array(
-					'id' => '446992558755793', 
-					'secret' => 'e114d6f31587f6fab5c993fe1fa8fa7c'
+					'id' => '', 
+					'secret' => ''
 				),
 				'scope' => 'email'
 			)
