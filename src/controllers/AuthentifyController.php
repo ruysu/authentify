@@ -3,6 +3,7 @@
 use Config;
 use Redirect;
 use URL;
+use View;
 use anlutro\LaravelController\Controller;
 use Illuminate\Auth\AuthManager;
 use Ruysu\Authentify\Repositories\UserRepositoryInterface;

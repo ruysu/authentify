@@ -11,7 +11,11 @@ class AuthentifyServiceProvider extends ServiceProvider {
 
 	public function boot() {
 		$this->package('ruysu/authentify');
-		$this->app['view']->share('user', $this->app['auth']->user());
+
+		$this->app['router']->before(function() {
+			$this->app['view']->composer('user', $this->app['auth']->user());
+		});
+
 		$this->registerRoutes();
 	}
 
