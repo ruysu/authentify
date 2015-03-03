@@ -16,7 +16,7 @@
     },
     "autoload": {
         "classmap": [
-            "resources/controllers"
+            "src/controllers"
         ],
         "psr-0": {
             "Ruysu\\Authentify\\": "src/"

@@ -10,7 +10,7 @@ class AuthentifyServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
 	public function boot() {
-		$this->package('ideaworksla/authentify', null, __DIR__ . '/../../../resources');
+		$this->package('ideaworksla/authentify');
 		$this->app['view']->share('user', $this->app['auth']->user());
 		$this->registerRoutes();
 	}
