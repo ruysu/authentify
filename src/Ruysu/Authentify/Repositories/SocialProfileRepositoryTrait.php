@@ -1,7 +1,10 @@
 <?php namespace Ruysu\Authentify\Repositories;
 
+use anlutro\LaravelRepository\Criteria\SimpleCriteria;
+
 trait SocialProfileRepositoryTrait {
 	protected $user;
+	protected $users;
 
 	public function setUser($user) {
 		$this->user = $user;
@@ -9,21 +12,23 @@ trait SocialProfileRepositoryTrait {
 
 	protected function beforeQuery($query, $many) {
 		if (isset($this->user)) {
-			$query->where('user_id', '=', $this->user->id);
+			with($criteria = new SimpleCriteria)->where('user_id', $this->users->getEntityKey($this->user));
+			$this->pushCriteria($criteria);
 		}
 	}
 
 	public function beforeCreate($entity, array $attributes) {
-		$this->user && $entity->user_id = $attributes['user_id'] = $this->user->id;
+		$this->user && $entity->user_id = $attributes['user_id'] = $this->users->getEntityKey($this->user);
 	}
 
-	public function getForUser($user) {
+	public function getForUser($user = null) {
+		with($criteria = new SimpleCriteria)->where('user_id', $this->users->getEntityKey($this->user ?: $user));
+		$this->pushCriteria($criteria);
 		$query = $this->newQuery();
-		$query->where('user_id', '=', $user->id);
 		return $this->fetchMany($query);
 	}
 
-	public function getUser($entity, UserRepositoryInterface $users) {
-		return $users->findByKey($entity->user_id);
+	public function getUser($entity) {
+		return $this->users->findByKey($entity->user_id);
 	}
 }

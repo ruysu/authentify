@@ -7,14 +7,14 @@ return array(
 			'Twitter' => array(
 				'enabled' => true,
 				'keys' => array(
-					'key' => '', 
+					'key' => '',
 					'secret' => ''
 				)
 			),
 			'Facebook' => array(
 				'enabled' => true,
 				'keys' => array(
-					'id' => '', 
+					'id' => '',
 					'secret' => ''
 				),
 				'scope' => 'email'

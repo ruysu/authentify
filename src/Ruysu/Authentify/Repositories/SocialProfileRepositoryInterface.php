@@ -6,6 +6,6 @@ interface SocialProfileRepositoryInterface {
 
 	public function getForUser($user);
 
-	public function getUser($entity, UserRepositoryInterface $users);
+	public function getUser($entity);
 
 }

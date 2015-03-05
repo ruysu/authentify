@@ -30,7 +30,7 @@ class SocialController extends AuthentifyController {
 		);
 
 		if ($social = $this->social_profiles->findByAttributes($attributes)) {
-			if ($user = $this->social_profiles->getUser($social, $this->users)) {
+			if ($user = $this->social_profiles->getUser($social)) {
 				$this->auth->login($user);
 				return $this->intended('/');
 			}
