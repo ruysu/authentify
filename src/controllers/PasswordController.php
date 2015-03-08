@@ -2,13 +2,16 @@
 
 use Hash;
 
-class PasswordController extends AuthentifyController {
-	public function getIndex() {
+class PasswordController extends AuthentifyController
+{
+	public function getIndex()
+	{
 		$password_action = $this->action('postIndex');
 		return $this->view('authentify::auth.password', compact('password_action'));
 	}
 
-	public function postIndex() {
+	public function postIndex()
+	{
 		$user = $this->auth->user();
 		$input = $this->inputFor('updatePassword', false);
 

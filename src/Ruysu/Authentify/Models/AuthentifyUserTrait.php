@@ -2,7 +2,8 @@
 
 trait AuthentifyUserTrait {
 
-	public function setPasswordAttribute($password) {
+	public function setPasswordAttribute($password)
+	{
 		$this->attributes['password'] = \Hash::make($password);
 	}
 

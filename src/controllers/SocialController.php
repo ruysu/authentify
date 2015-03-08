@@ -1,24 +1,25 @@
 <?php namespace Authentify;
 
 use App;
-use Crypt;
 use Exception;
-use Hybrid_Endpoint;
 use Queue;
-use Session;
+use Hybrid_Endpoint;
 use Illuminate\Auth\AuthManager;
 use Ruysu\Authentify\Repositories\UserRepositoryInterface;
-use Ruysu\Authentify\Repositories\SocialProfileRepositoryInterface;
+use Ruysu\Authentify\Repositories\SocialProfileDatabaseRepository;
 
-class SocialController extends AuthentifyController {
+class SocialController extends AuthentifyController
+{
 	protected $social_profiles;
 
-	public function __construct(UserRepositoryInterface $users, SocialProfileRepositoryInterface $social_profiles, AuthManager $auth) {
+	public function __construct(UserRepositoryInterface $users, SocialProfileDatabaseRepository $social_profiles, AuthManager $auth)
+	{
 		$this->social_profiles = $social_profiles;
 		parent::__construct($users, $auth);
 	}
 
-	public function getIndex($network) {
+	public function getIndex($network)
+	{
 		$hybridauth = App::make('authentify.hybridauth', $this->url('getDo'));
 
 		$provider = $hybridauth->authenticate($network);
@@ -55,7 +56,6 @@ class SocialController extends AuthentifyController {
 					'name' => $profile->firstName . ' ' . $profile->lastName,
 					'picture' => isset($profile->photoURL) && $profile->photoURL ? $profile->photoURL : '',
 					'password' => str_random(8),
-					'active' => 1
 				);
 
 				if ($user = $this->users->socialSignUp($input)) {
@@ -78,7 +78,8 @@ class SocialController extends AuthentifyController {
 		}
 	}
 
-	public function getDo() {
+	public function getDo()
+	{
 		try {
 			Hybrid_Endpoint::process();
 		}

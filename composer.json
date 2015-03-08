@@ -11,6 +11,8 @@
         "php": ">=5.4.0",
         "illuminate/support": "4.2.*",
         "hybridauth/hybridauth": "2.3.*",
+        "rhumsaa/uuid": "2.8.*",
+        "cbschuld/browser.php": "dev-master",
         "anlutro/l4-repository": "0.7.8",
         "anlutro/l4-controller": "0.3.4"
     },

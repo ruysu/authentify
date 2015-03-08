@@ -3,7 +3,8 @@
 return array(
 
 	'sign-in' => array(
-		'error' => 'E-mail or password missmatch.',
+		'activate' => 'User account has not been activated.',
+		'error' => 'Credentials mismatch.',
 		'success' => 'You have successfully logged in.'
 	),
 

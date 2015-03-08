@@ -4,7 +4,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-abstract class MigrationCommand extends Command {
+abstract class MigrationCommand extends Command
+{
 
 	protected $package = 'authentify';
 

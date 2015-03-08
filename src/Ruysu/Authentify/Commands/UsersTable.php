@@ -1,6 +1,7 @@
 <?php namespace Ruysu\Authentify\Commands;
 
-class UsersTable extends MigrationCommand {
+class UsersTable extends MigrationCommand
+{
 
 	protected $table = 'users';
 	protected $name = 'authentify:users-table';

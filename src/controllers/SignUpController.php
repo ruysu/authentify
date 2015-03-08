@@ -4,13 +4,16 @@ use App;
 use Crypt;
 use Queue;
 
-class SignUpController extends AuthentifyController {
-	public function getIndex() {
+class SignUpController extends AuthentifyController
+{
+	public function getIndex()
+	{
 		$sign_up_action = $this->action('postIndex');
 		return $this->view('authentify::auth.sign-up', compact('sign_up_action'));
 	}
 
-	public function postIndex() {
+	public function postIndex()
+	{
 		$input = $this->inputFor('signUp');
 		$input['active'] = !$this->config('confirmable');
 
@@ -38,7 +41,8 @@ class SignUpController extends AuthentifyController {
 		} 
 	}
 
-	public function getActivate($token) {
+	public function getActivate($token)
+	{
 		$id = Crypt::decrypt($token);
 		$user = $this->users->findByKey($id);
 

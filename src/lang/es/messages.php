@@ -3,7 +3,8 @@
 return array(
 
 	'sign-in' => array(
-		'error' => 'Correo electrónico o contraseña no coincide.',
+		'activate' => 'La cuenta no ha sido activado.',
+		'error' => 'Las credenciales no coinciden.',
 		'success' => 'Has iniciado sesión con éxito.'
 	),
 

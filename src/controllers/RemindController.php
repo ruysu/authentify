@@ -4,20 +4,23 @@ use Config;
 use DB;
 use Password;
 
-class RemindController extends AuthentifyController {
-	public function getIndex() {
+class RemindController extends AuthentifyController
+{
+	public function getIndex()
+	{
 		$remind_action = $this->action('postIndex');
 		return $this->view('authentify::auth.remind', compact('remind_action'));
 	}
 
-	public function postIndex() {
+	public function postIndex()
+	{
 		$input = $this->inputFor('remind');
-		// var_dump($this->valid('remind', $input, false));exit;
 
 		if ($this->valid('remind', $input, false)) {
 			Config::set('auth.reminder.email', 'authentify::emails.reminder');
 
-			$response = Password::remind($input, function ($message) {
+			$response = Password::remind($input, function ($message)
+			{
 				$message->subject('Password recovery');
 			});
 
@@ -38,22 +41,24 @@ class RemindController extends AuthentifyController {
 		}
 	}
 
-	public function getReset($token) {
+	public function getReset($token)
+	{
 		$reset_action = $this->action('postReset');
 		return $this->view('authentify::auth.reset', compact('token', 'reset_action'));
 	}
 
-	public function postReset() {
+	public function postReset()
+	{
 		$input = $this->inputFor('reset');
 
 		if ($this->valid('reset', $input, false)) {
 			$email = DB::table('password_reminders')->where('token', $input['token'])->first();
 			$input['email'] = $email ? $email->email : '';
 			$users = $this->users;
-			$response = Password::reset($input, function ($user, $password) use ($users) {
+			$response = Password::reset($input, function ($user, $password) use ($users)
+			{
 				$users->changePassword($user, compact('password'));
 			});
-			// var_dump($response);exit;
 
 			switch($response) {
 				case Password::INVALID_PASSWORD :
@@ -75,10 +80,5 @@ class RemindController extends AuthentifyController {
 				->withErrors($this->errors())
 				->withInput();
 		}
-
-
-		
-
-		
 	}
 }

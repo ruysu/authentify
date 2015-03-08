@@ -2,4 +2,6 @@
 
 use Exception;
 
-class AuthentifySocialException extends Exception{}
+class AuthentifySocialException extends Exception
+{
+}

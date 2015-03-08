@@ -2,8 +2,10 @@
 
 use Session;
 
-class SignOutController extends AuthentifyController {
-	public function anyIndex() {
+class SignOutController extends AuthentifyController
+{
+	public function anyIndex()
+	{
 		$this->auth->logout();
 
 		$redirect = $this->input('redirect', '/');

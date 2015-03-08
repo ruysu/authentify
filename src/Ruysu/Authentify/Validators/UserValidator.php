@@ -54,8 +54,6 @@ abstract class UserValidator extends Validator {
 	}
 
 	public function getEditRules() {
-		$this->merge = false;
-
 		return [
 			'picture' => 'image'
 		];

@@ -1,12 +1,15 @@
 <?php namespace Authentify;
 
-class EditController extends AuthentifyController {
-	public function getIndex() {
+class EditController extends AuthentifyController
+{
+	public function getIndex()
+	{
 		$edit_action = $this->action('postIndex');
 		return $this->view('authentify::auth.edit', compact('edit_action'));
 	}
 
-	public function postIndex() {
+	public function postIndex()
+	{
 		$user = $this->auth->user();
 		$input = $this->inputFor('edit');
 
