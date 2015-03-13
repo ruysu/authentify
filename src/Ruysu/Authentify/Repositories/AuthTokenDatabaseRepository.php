@@ -12,10 +12,10 @@ namespace Ruysu\Authentify\Repositories;
 use Browser;
 use Config;
 use Datetime;
-use DecryptException;
 use Rhumsaa\Uuid\Uuid;
 use anlutro\LaravelRepository\DatabaseRepository;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 
 class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRepositoryInterface
