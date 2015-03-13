@@ -1,4 +1,13 @@
-<?php namespace Ruysu\Authentify\Events;
+<?php
+/**
+ * Laravel 4 Authentication with an abstraction layer. 
+ *
+ * @author   Gerardo Gómez <code@gerardo.im>
+ * @license  http://opensource.org/licenses/MIT
+ * @package  authentify
+ */
+
+namespace Ruysu\Authentify\Events;
 
 use Ruysu\Authentify\Repositories\UserRepositoryInterface;
 use DateTime;
@@ -7,7 +16,8 @@ class SignInHandler
 {
 	protected $users;
 
-	public function __construct(UserRepositoryInterface $users) {
+	public function __construct(UserRepositoryInterface $users)
+	{
 		$this->users = $users;
 	}
 

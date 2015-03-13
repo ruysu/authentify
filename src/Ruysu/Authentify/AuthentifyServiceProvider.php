@@ -1,6 +1,6 @@
 <?php
 /**
- * Laravel 4 Authentication with an abstraction layer and 
+ * Laravel 4 Authentication with an abstraction layer.
  *
  * @author   Gerardo Gómez <code@gerardo.im>
  * @license  http://opensource.org/licenses/MIT
@@ -13,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use Ruysu\Authentify\Commands\UsersTable;
 use Ruysu\Authentify\Commands\SocialProfilesTable;
 use Ruysu\Authentify\Commands\TokensTable;
+use Ruysu\Authentify\Commands\RepositoryCommand;
 use Hybrid_Auth;
 use Response;
 
@@ -77,7 +78,12 @@ class AuthentifyServiceProvider extends ServiceProvider
 			return new TokensTable;
 		});
 
-		$this->commands('authentify.users-table', 'authentify.tokens-table', 'authentify.social_profiles-table');
+		$this->app->bind('authentify.repository', function ()
+		{
+			return new RepositoryCommand;
+		});
+
+		$this->commands('authentify.users-table', 'authentify.tokens-table', 'authentify.social_profiles-table', 'authentify.repository');
 	}
 
 	/**
@@ -113,26 +119,10 @@ class AuthentifyServiceProvider extends ServiceProvider
 	 */
 	protected function registerFilters()
 	{
-		$app = $this->app;
-
-		$this->app['router']->filter('authentify.check', function() use ($app)
-		{
-			if ($app['auth']->guest()) {
-				if ($app['request']->ajax()) {
-					return Response::make('Unauthorized', 401);
-				}
-				else {
-					return $app['redirect']->guest($app['url']->action('Authentify\SignInController@getIndex'));
-				}
-			}
-		});
-
-		$this->app['router']->filter('authentify.guest', function() use ($app)
-		{
-			if ($app['auth']->check()) {
-				return $app['redirect']->to('/');
-			}
-		});
+		$this->app['router']->filter('authentify.check', 'Ruysu\Authentify\Filters\CheckFilter');
+		$this->app['router']->filter('authentify.guest', 'Ruysu\Authentify\Filters\GuestFilter');
+		$this->app['router']->filter('authentify.token.check', 'Ruysu\Authentify\Filters\TokenCheckFilter');
+		$this->app['router']->filter('authentify.token.parse', 'Ruysu\Authentify\Filters\TokenParseFilter');
 	}
 
 	/**
@@ -316,8 +306,9 @@ class AuthentifyServiceProvider extends ServiceProvider
 	public function provides()
 	{
 		return array(
-			'authentify.users-table', 'authentify.social_profiles-table',
+			'authentify.users-table', 'authentify.social_profiles-table', 'authentify.tokens-table', 'authentify.repository',
 			'authentify.check', 'authentify.guest',
+			'authentify.token.check', 'authentify.token.parse',
 			'authentify.hybridauth'
 		);
 	}

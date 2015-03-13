@@ -7,10 +7,10 @@
  * @package  authentify
  */
 
-namespace Ruysu\Authentify\Models;
+namespace Users;
 
-interface AuthentifyUserInterface {
+use Ruysu\Authentify\Validators\UserValidator as Validator;
 
-	public function setPasswordAttribute($password);
-
+class UserValidator extends Validator
+{
 }

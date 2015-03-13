@@ -1,9 +1,25 @@
-<?php namespace Ruysu\Authentify\Validators;
+<?php
+/**
+ * Laravel 4 Authentication with an abstraction layer. 
+ *
+ * @author   Gerardo Gómez <code@gerardo.im>
+ * @license  http://opensource.org/licenses/MIT
+ * @package  authentify
+ */
+
+namespace Ruysu\Authentify\Validators;
 
 use anlutro\LaravelValidation\Validator;
 
-abstract class UserValidator extends Validator {
-	protected function getCommonRules() {
+abstract class UserValidator extends Validator
+{
+	/**
+	 * Rules used in every validation call.
+	 *
+	 * @return array
+	 */
+	protected function getCommonRules()
+	{
 		$identifier = $this->getIdentifierKey();
 
 		return array(
@@ -12,17 +28,35 @@ abstract class UserValidator extends Validator {
 		);
 	}
 
-	public function getCreateRules() {
+	/**
+	 * Rules used on creation validation call.
+	 *
+	 * @return array
+	 */
+	public function getCreateRules()
+	{
 		return $this->getSignUpRules();
 	}
 
-	public function getUpdateRules() {
+	/**
+	 * Rules used on update validation call.
+	 *
+	 * @return array
+	 */
+	public function getUpdateRules()
+	{
 		return [
 			'password' => $this->passwordRule(false)
 		];
 	}
 
-	public function getSignInRules() {
+	/**
+	 * Rules used on sign in validation call.
+	 *
+	 * @return array
+	 */
+	public function getSignInRules()
+	{
 		$this->merge = false;
 		$identifier = $this->getIdentifierKey();
 
@@ -32,20 +66,38 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function getSocialSignUpRules() {
+	/**
+	 * Rules used on social sign up validation call.
+	 *
+	 * @return array
+	 */
+	public function getSocialSignUpRules()
+	{
 		return [
 			'picture' => 'url',
 			'password' => $this->passwordRule(true, false),
 		];
 	}
 
-	public function getSignUpRules() {
+	/**
+	 * Rules used on sign up validation call.
+	 *
+	 * @return array
+	 */
+	public function getSignUpRules()
+	{
 		return [
 			'password' => $this->passwordRule()
 		];
 	}
 
-	public function getActivateRules() {
+	/**
+	 * Rules used on activation validation call.
+	 *
+	 * @return array
+	 */
+	public function getActivateRules()
+	{
 		$this->merge = false;
 
 		return [
@@ -53,13 +105,25 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function getEditRules() {
+	/**
+	 * Rules used on account edit validation call.
+	 *
+	 * @return array
+	 */
+	public function getEditRules()
+	{
 		return [
 			'picture' => 'image'
 		];
 	}
 
-	public function getUpdatePasswordRules() {
+	/**
+	 * Rules used on password update validation call.
+	 *
+	 * @return array
+	 */
+	public function getUpdatePasswordRules()
+	{
 		$this->merge = false;
 
 		return [
@@ -68,7 +132,13 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function getChangePasswordRules() {
+	/**
+	 * Rules used on change password validation call.
+	 *
+	 * @return array
+	 */
+	public function getChangePasswordRules()
+	{
 		$this->merge = false;
 
 		return [
@@ -76,7 +146,13 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function getRemindRules() {
+	/**
+	 * Rules used on password remind validation call.
+	 *
+	 * @return array
+	 */
+	public function getRemindRules()
+	{
 		$this->merge = false;
 		$identifier = $this->getIdentifierKey();
 
@@ -85,7 +161,13 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function getResetRules() {
+	/**
+	 * Rules used on password reset validation call.
+	 *
+	 * @return array
+	 */
+	public function getResetRules()
+	{
 		$this->merge = false;
 
 		return [
@@ -94,11 +176,27 @@ abstract class UserValidator extends Validator {
 		];
 	}
 
-	public function rules($action, $merge = null) {
+	/**
+	 * Return the validation rules for any given action.
+	 *
+	 * @param  string  $action
+	 * @param  boolean|null  $merge
+	 * @return array
+	 */
+	public function rules($action, $merge = null)
+	{
 		return $this->getRules($action, $merge);
 	}
 
-	protected function identifierRule($required = true, $unique = true) {
+	/**
+	 * Construct the validation rule for the identifier field.
+	 *
+	 * @param  boolean  $required
+	 * @param  boolean|null  $merge
+	 * @return array
+	 */
+	protected function identifierRule($required = true, $unique = true)
+	{
 		$rules = $this->validateIdentifier();
 
 		$required && $rules []= 'required';
@@ -107,15 +205,35 @@ abstract class UserValidator extends Validator {
 		return $rules;
 	}
 
-	protected function validateIdentifier() {
+	/**
+	 * Get the validation rule for the identifier field, should not include required nor unique.
+	 *
+	 * @return array
+	 */
+	protected function validateIdentifier()
+	{
 		return ['email'];
 	}
 
-	protected function getIdentifierKey() {
+	/**
+	 * Get the identifier field name.
+	 *
+	 * @return string
+	 */
+	protected function getIdentifierKey()
+	{
 		return 'email';
 	}
 
-	protected function passwordRule($required = true, $confirmed = true) {
+	/**
+	 * Construct the validation rule for the password field.
+	 *
+	 * @param  boolean  $required
+	 * @param  boolean  $confirmed
+	 * @return array
+	 */
+	protected function passwordRule($required = true, $confirmed = true)
+	{
 		$rules = $this->validatePassword();
 
 		$required && $rules []= 'required';
@@ -124,11 +242,23 @@ abstract class UserValidator extends Validator {
 		return $rules;
 	}
 
-	protected function validatePassword() {
+	/**
+	 * Get the validation rule for the password field, should not include, confirmed nor required.
+	 *
+	 * @return array
+	 */
+	protected function validatePassword()
+	{
 		return ['min:6'];
 	}
 
-	protected function unique($column, $softDelete = false) {
+	/**
+	 * Construct a unique validation statement.
+	 *
+	 * @return string
+	 */
+	protected function unique($column, $softDelete = false)
+	{
 		return 'unique:<table>,' . $column . ',<key>' . ($softDelete ? ',id,deleted_at,NULL' : '');
 	}
 }

@@ -1,0 +1,25 @@
+<?php
+/**
+ * Laravel 4 Authentication with an abstraction layer. 
+ *
+ * @author   Gerardo Gómez <code@gerardo.im>
+ * @license  http://opensource.org/licenses/MIT
+ * @package  authentify
+ */
+
+namespace Users;
+
+use Ruysu\Authentify\Repositories\UserRepositoryInterface;
+use Ruysu\Authentify\Repositories\UserRepositoryTrait;
+use anlutro\LaravelRepository\EloquentRepository;
+use User;
+
+class UserRepository extends EloquentRepository implements UserRepositoryInterface
+{
+	use UserRepositoryTrait;
+
+	public function __construct(User $model, UserValidator $validator)
+	{
+		parent::__construct($model, $validator);
+	}
+}

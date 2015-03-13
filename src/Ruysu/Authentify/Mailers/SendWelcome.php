@@ -1,4 +1,13 @@
-<?php namespace Ruysu\Authentify\Mailers;
+<?php
+/**
+ * Laravel 4 Authentication with an abstraction layer. 
+ *
+ * @author   Gerardo Gómez <code@gerardo.im>
+ * @license  http://opensource.org/licenses/MIT
+ * @package  authentify
+ */
+
+namespace Ruysu\Authentify\Mailers;
 
 use Config;
 use Mail;

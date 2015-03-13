@@ -3,9 +3,8 @@
 use App;
 use Exception;
 use Queue;
-use Browser;
+use Hash;
 use Hybrid_Endpoint;
-use Rhumsaa\Uuid\Uuid;
 use Illuminate\Auth\AuthManager;
 use anlutro\LaravelController\ApiController as Controller;
 use Ruysu\Authentify\Controllers\AuthentifyControllerTrait;
@@ -27,9 +26,12 @@ class ApiController extends Controller
 		$this->social_profiles = $social_profiles;
 		$this->tokens = $tokens;
 		$this->users = $users;
+
+		$this->beforeFilter('authentify.token.check', ['except' => ['postSignIn', 'postSignUp']]);
 	}
 
-	public function postSignIn() {
+	public function postSignIn()
+	{
 		$credentials = $this->inputFor('signIn');
 
 		if ($this->valid('signIn', $credentials, false)) {
@@ -38,29 +40,17 @@ class ApiController extends Controller
 				$user = $this->auth->user();
 
 				if ($user->active) {
-					$this->tokens->setUser($user);
-
-					$browser = new Browser;
-					$attributes = [
-						'client' => implode(' ', [$browser->getBrowser(), $browser->getVersion(), 'on', $browser->getPlatform()])
-					];
-
-					if (!($token = $this->tokens->findByAttributes($attributes))) {
-						$attributes['token'] = (string) Uuid::uuid1();
-						$token = $this->tokens->create($attributes);
-					}
-
-					$this->response['token'] = $token->token;
+					$this->response['token'] = $this->tokens->getToken($user);
 					$this->response['user'] = $user;
 					$this->response['success'] = true;
 				}
 				else {
-					$this->response['status'] = 403;
+					$this->response['status'] = 401;
 					$this->response['message'] = 'Unauthorized, account not yet activated';
 				}
 			}
 			else {
-				$this->response['status'] = 403;
+				$this->response['status'] = 401;
 				$this->response['message'] = 'Unauthorized';
 			}
 		}
@@ -72,35 +62,90 @@ class ApiController extends Controller
 		return $this->respond();
 	}
 
-	public function postSignUp() {
+	public function postSignUp()
+	{
 		$input = $this->inputFor('signUp');
-		$input['active'] = !$this->config('confirmable');
+		$input['active'] = 1;
 
 		if ($user = $this->users->signUp($input)) {
 			$password = $this->input('password');
 
-			if ($input['active']) {
-				$this->config('welcomable') && Queue::push('Ruysu\Authentify\Mailers\SendWelcome', compact('password', 'user'));
-				$this->login($user);
+			$this->config('welcomable') && Queue::push('Ruysu\Authentify\Mailers\SendWelcome', compact('password', 'user'));
 
-				return $this->intended('/');
-			}
+			$this->response['token'] = $this->tokens->getToken($user);
+			$this->response['user'] = $user;
+			$this->response['success'] = true;
+		}
+		else {
+			$this->response['status'] = 400;
+			return $this->response['errors'] = $this->errors();
+		}
+
+		return $this->respond();
+	}
+
+	public function getInfo()
+	{
+		$user = $this->auth->user();
+
+		$this->response['token'] = $this->tokens->getToken($user);
+		$this->response['user'] = $user;
+		$this->response['success'] = true;
+
+		return $this->respond();
+	}
+
+	public function postEdit()
+	{
+		$user = $this->auth->user();
+		$input = $this->inputFor('edit');
+
+		if($this->users->edit($user, $input)) {
+			$this->response['token'] = $this->tokens->getToken($user);
+			$this->response['user'] = $user;
+			$this->response['success'] = true;
+		}
+		else {
+			$this->response['status'] = 400;
+			return $this->response['errors'] = $this->errors();
+		}
+
+		return $this->respond();
+	}
+
+	public function postPassword()
+	{
+		$user = $this->auth->user();
+		$input = $this->inputFor('updatePassword', false);
+
+		if ($this->valid('updatePassword', $input, false)) {
+			if (Hash::check($input['current_password'], $user->password) && $this->users->updatePassword($user, $input)) {
+				$this->response['token'] = $this->tokens->getToken($user);
+				$this->response['user'] = $user;
+				$this->response['success'] = true;
+			} 
 			else {
-				$token = Crypt::encrypt($user->id);
-				Queue::push('Ruysu\Authentify\Mailers\SendActivate', compact('password', 'token', 'user'));
-
-				return $this->redirect('Authentify\SignInController@getIndex')
-					->with('authentify.notice', array('warning', trans('authentify::messages.sign-up.success')));
+				$this->response['status'] = 400;
+				return $this->response['errors'] = $this->errors();
 			}
 		}
 		else {
-			return $this->redirect('getIndex')
-				->withErrors($this->errors())
-				->withInput();
-		} 
+			$this->response['status'] = 400;
+			return $this->response['errors'] = $this->errors();
+		}
+
+		return $this->respond();
 	}
 
-	protected function respond() {
+	protected function respond()
+	{
 		return $this->jsonResponse($this->response, $this->response['status']);
+	}
+
+	public function missingMethod($params = array())
+	{
+		$this->response['status'] = 404;
+		$this->response['message'] = 'Not found';
+		return $this->respond();
 	}
 }
