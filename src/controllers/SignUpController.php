@@ -22,7 +22,7 @@ class SignUpController extends AuthentifyController
 
 			if ($input['active']) {
 				$this->config('welcomable') && Queue::push('Ruysu\Authentify\Mailers\SendWelcome', compact('password', 'user'));
-				$this->login($user);
+				$this->auth->login($user);
 
 				return $this->intended('/');
 			}

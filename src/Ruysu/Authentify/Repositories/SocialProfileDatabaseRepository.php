@@ -12,6 +12,7 @@ namespace Ruysu\Authentify\Repositories;
 use anlutro\LaravelRepository\DatabaseRepository;
 use Illuminate\Database\DatabaseManager;
 use Config;
+use Datetime;
 
 class SocialProfileDatabaseRepository extends DatabaseRepository implements OwnedRepositoryInterface
 {

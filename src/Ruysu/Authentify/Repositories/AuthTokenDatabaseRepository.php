@@ -9,24 +9,23 @@
 
 namespace Ruysu\Authentify\Repositories;
 
-use Browser;
 use Config;
 use Datetime;
 use Rhumsaa\Uuid\Uuid;
 use anlutro\LaravelRepository\DatabaseRepository;
+use Illuminate\Support\Fluent;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 
 class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRepositoryInterface
 {
 	use OwnedRepositoryTrait;
 
-	protected $browser;
 	protected $encrypter;
 
-	public function __construct (UserRepositoryInterface $users, DatabaseManager $db, Encrypter $encrypter, Browser $browser)
+	public function __construct (UserRepositoryInterface $users, DatabaseManager $db, Encrypter $encrypter)
 	{
-		$this->browser = $browser;
 		$this->users = $users;
 		$this->encrypter = $encrypter;
 		$this->table = Config::get('authentify::auth_tokens.table');
@@ -42,12 +41,11 @@ class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRep
 		$this->setUser($user);
 
 		$attributes = [
-			'client' => $this->browser()
+			'user_id' => $this->users->getEntityKey($user)
 		];
 
 		if (!($token = $this->findByAttributes($attributes))) {
 			$attributes['token'] = (string) Uuid::uuid1();
-			$attributes['client'] = $this->browser();
 
 			$token = $this->create($attributes);
 		}
@@ -59,17 +57,16 @@ class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRep
 	{
 		$this->setUser(null);
 
-		if (!($token instanceof Fluent)) {
+		if (!is_object($token)) {
 			$token = $this->deserializeToken($token);
 		}
 
-		if (!($token && $token->client == $this->browser())) {
+		if (!$token) {
 			return false;
 		}
 
 		$attributes = [
-			'token' => $token->token,
-			'client' => $this->browser()
+			'token' => $token->token
 		];
 
 		if ($token = $this->findByAttributes($attributes)) {
@@ -94,17 +91,11 @@ class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRep
 		return parent::create($entity, $attributes);
 	}
 
-	protected function browser()
-	{
-		return implode(' ', [$this->browser->getBrowser(), $this->browser->getVersion(), 'on', $this->browser->getPlatform()]);
-	}
-
 	public function serializeToken($token)
 	{
 		$payload = $this->encrypter->encrypt(array(
 			'user_id' => $token->user_id,
-			'token' => $token->token,
-			'client' => $token->client,
+			'token' => $token->token
 		));
 
 		$payload = str_replace(array('+', '/', '\r', '\n', '='), array('-', '_'), $payload);
@@ -122,7 +113,7 @@ class AuthTokenDatabaseRepository extends DatabaseRepository implements OwnedRep
 			return null;
 		}
 
-		if (empty($data['user_id']) || empty($data['token']) || empty($data['client'])) {
+		if (empty($data['user_id']) || empty($data['token'])) {
 			return null;
 		}
 

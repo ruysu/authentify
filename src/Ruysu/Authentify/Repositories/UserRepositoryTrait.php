@@ -221,6 +221,9 @@ trait UserRepositoryTrait
 					$attributes[$key] = asset('uploads/users/' . $file->getClientOriginalName());
 				}
 			}
+			else {
+				unset($attributes[$key]);
+			}
 		}
 		unset($key, $file);
 	}

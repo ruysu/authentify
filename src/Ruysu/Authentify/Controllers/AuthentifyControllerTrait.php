@@ -9,6 +9,8 @@
 
 namespace Ruysu\Authentify\Controllers;
 
+use Config;
+
 trait AuthentifyControllerTrait {
 	protected function valid($action, array $attributes, $merge = true)
 	{

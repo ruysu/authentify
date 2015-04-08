@@ -58,8 +58,8 @@ class SocialController extends AuthentifyController
 					'password' => str_random(8),
 				);
 
-				if ($user = $this->users->socialSignUp($input)) {
-					$this->redirect('Authentify\SignUpController@getIndex')
+				if (!($user = $this->users->socialSignUp($input))) {
+					return $this->redirect('Authentify\SignUpController@getIndex')
 						->withErrors($this->errors())
 						->withInput($input);
 				}
